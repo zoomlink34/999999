@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#000; color:#fff; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+    <div style="background:#111; border:2px solid #333; padding:35px; text-align:center; width:300px; border-radius:15px;">
+        <div id="f">
+            <h2 style="color:#facc15">RESERVE PLOT</h2>
+            <input type="text" id="bn" placeholder="Your Brand Name" style="width:90%; padding:15px; margin:20px 0; background:#000; color:#fff; border:1px solid #444; border-radius:5px;">
+            <button onclick="save()" id="btn" style="width:100%; padding:15px; background:#ef4444; color:#fff; font-weight:bold; cursor:pointer; border:none; border-radius:5px;">SUBMIT ORDER</button>
+        </div>
+        <div id="s" style="display:none;">
+            <h1 style="color:#22c55e">✓ SUCCESSFUL!</h1>
+            <p>Order received by CEO. Pay $20 and contact WhatsApp.</p>
+            <button onclick="window.location.href='index.html'" style="margin-top:20px; padding:10px 20px; cursor:pointer;">BACK TO HOME</button>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script>
+        firebase.initializeApp({databaseURL: "https://m-legacy-5cf2b-default-rtdb.firebaseio.com/"});
+        function save() {
+            const n = document.getElementById('bn').value;
+            if(!n) return alert("Enter Name!");
+            document.getElementById('btn').innerText = "Sending...";
+            firebase.database().ref('orders/' + Date.now()).set({ name: n, plotID: Math.floor(Math.random()*20000)+1 })
+            .then(() => { document.getElementById('f').style.display='none'; document.getElementById('s').style.display='block'; });
+        }
+    </script>
+</body>
+</html>
