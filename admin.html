@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#050505; color:#fff; font-family:sans-serif; padding:40px;">
+    <div id="l" style="text-align:center; margin-top:100px;">
+        <h1 style="color:#facc15">CEO ACCESS ONLY</h1>
+        <input type="password" id="p" placeholder="Paste Password" style="padding:12px; width:250px; background:#111; color:#fff; border:1px solid #333;">
+        <button onclick="auth()" style="padding:12px 25px; background:#facc15; border:none; cursor:pointer; font-weight:bold;">LOGIN</button>
+    </div>
+    <div id="ap" style="display:none;">
+        <h2 style="border-bottom:2px solid #333; padding-bottom:10px;">PENDING ORDERS</h2>
+        <div id="list"></div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script>
+        function auth() {
+            if(document.getElementById('p').value === "KAWSARahmed22@@") {
+                document.getElementById('l').style.display='none'; document.getElementById('ap').style.display='block'; start();
+            } else { alert("Wrong Password!"); }
+        }
+        function start() {
+            firebase.initializeApp({databaseURL: "https://m-legacy-5cf2b-default-rtdb.firebaseio.com/"});
+            const db = firebase.database();
+            db.ref('orders').on('value', s => {
+                const list = document.getElementById('list'); list.innerHTML = "";
+                const data = s.val(); if(!data) return list.innerHTML = "No orders.";
+                Object.keys(data).forEach(id => {
+                    list.innerHTML += `<div style="background:#111; padding:20px; border:1px solid #22c55e; border-radius:10px; margin-bottom:15px;">
+                        <h3>Brand: ${data[id].name} (ID: ${data[id].plotID})</h3>
+                        <input type="text" id="i_${id}" placeholder="Logo URL"><br>
+                        <input type="text" id="w_${id}" placeholder="Website URL"><br>
+                        <button onclick="approve('${id}', ${data[id].plotID}, '${data[id].name}')" style="background:green; color:#fff; border:none; padding:10px 20px; cursor:pointer; margin-top:10px;">PUBLISH</button>
+                    </div>`;
+                });
+            });
+        }
+        function approve(id, plotID, name) {
+            const img = document.getElementById('i_'+id).value, web = document.getElementById('w_'+id).value;
+            if(!img || !web) return alert("Fill all!");
+            const x = ((plotID-1) % 100) * 60, y = Math.floor((plotID-1) / 100) * 40;
+            firebase.database().ref('pixels/' + id).set({ name, imageUrl: img, link: web, x, y, plotID })
+            .then(() => { firebase.database().ref('orders/' + id).remove(); alert("Live!"); });
+        }
+    </script>
+</body>
+</html>
